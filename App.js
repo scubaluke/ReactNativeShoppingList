@@ -1,13 +1,42 @@
-import React from 'react';
-import {View, Text, Image, StyleSheet} from 'react-native';
+import React, {useState} from 'react';
+import {View, Text, StyleSheet, FlatList, Alert} from 'react-native';
+import uuid from 'react-native-uuid';
+import Header from './components/Header';
+import ListItem from './components/ListItem';
+import AddItem from './components/AddItem';
 
 const App = () => {
+  const [items, setItems] = useState([
+    {id: uuid.v4(), text: 'Milk'},
+    {id: uuid.v4(), text: 'Eggs'},
+    {id: uuid.v4(), text: 'Bred'},
+    {id: uuid.v4(), text: 'Cheese'},
+  ]);
+
+  function deleteItem(id) {
+    setItems(prevItems => {
+      return prevItems.filter(item => item.id != id);
+    });
+  }
+
+  function addItem(text) {
+    if (!text) {
+      Alert.alert('Excuse me:', 'Please enter item', {text: 'Got it'});
+    } else {
+      setItems(prevItems => {
+        return [{id: uuid.v4(), text}, ...prevItems];
+      });
+    }
+  }
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>hello world</Text>
-      <Image
-        source={{uri: 'https://randomuser.me/api/portraits/men/1.jpg'}}
-        style={styles.img}
+      <Header />
+      <AddItem addItem={addItem} />
+      <FlatList
+        data={items}
+        renderItem={({item}) => (
+          <ListItem item={item} deleteItem={deleteItem} />
+        )}
       />
     </View>
   );
@@ -16,11 +45,8 @@ const App = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    paddingTop: 60,
   },
-  text: {color: 'red', fontSize: 30},
-  img: {width: 100, height: 100, borderRadius: 50},
 });
 
 export default App;
